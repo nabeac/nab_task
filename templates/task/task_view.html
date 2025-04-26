@@ -1,0 +1,159 @@
+{% extends 'index.html' %}
+{% load crispy_forms_tags %}
+
+{% load humanize %}
+{% block title %}
+    {{task_view.title}}
+{% endblock %}
+{% block task %}
+
+ 
+  
+
+
+
+<div class="bg-gray-900 text-white min-h-screen py-10 px-4 ">
+    <div class="max-w-screen-lg mx-auto">
+      <h1 class="text-4xl font-extrabold mb-10 text-center text-teal-400 border-b border-teal-600 pb-4">
+        جزئیات تسک
+      </h1>
+  
+      <div class="bg-gray-800 p-8 rounded-2xl shadow-lg space-y-6">
+        <div class="grid sm:grid-cols-2 gap-6">
+          <div>
+            <p class="text-sm text-teal-300 font-semibold">عنوان</p>
+            <p class="text-lg mt-1">{{ task_view.title }}</p>
+          </div>
+  
+          <div>
+            <p class="text-sm text-teal-300 font-semibold">تاریخ ایجاد</p>
+            <p class="text-lg mt-1">{{ task_view.start_date }}</p>
+          </div>
+  
+          <div>
+            <p class="text-sm text-teal-300 font-semibold">مهلت تسک</p>
+            <p class="text-lg mt-1">{{ task_view.end_date }}</p>
+          </div>
+  
+          <div>
+            <p class="text-sm text-teal-300 font-semibold">ایجاد کننده</p>
+            <p class="text-lg mt-1">{{ task_view.creator }}</p>
+          </div>
+  
+          <div>
+            <p class="text-sm text-teal-300 font-semibold">مسئول اصلی</p>
+            <p class="text-lg mt-1">{{ task_view.main_responsible }}</p>
+          </div>
+  
+          <div>
+            <p class="text-sm text-teal-300 font-semibold">وضعیت</p>
+            <span class="inline-block text-sm mt-1 px-3 py-1 rounded-full bg-{{ task_view.get_status_color }} text-black font-semibold">
+              {{ task_view.status }}
+            </span>
+          </div>
+        </div>
+  
+        <div>
+          <p class="text-sm text-teal-300 font-semibold">توضیحات</p>
+          <div class="bg-gray-700 p-4 rounded-xl mt-2 max-h-40 overflow-auto text-sm leading-relaxed">
+            {{ task_view.description }}
+          </div>
+        </div>
+        <div class="grid sm:grid-cols-2 gap-6">
+        <div>
+          <p class="text-sm text-teal-300 font-semibold">در دست بررسی توسط</p>
+          <p class="text-lg mt-1">{{ task_view.review_by }}</p>
+        </div>
+
+        <div>
+            <p class="text-sm text-teal-300 font-semibold">فایل پیوست</p>
+            {% if task_view.task_file %}
+              <a href="{{ task_view.task_file.url }}"
+                 class="inline-flex items-center mt-2 text-sm px-4 py-2 bg-teal-500 hover:bg-teal-600 text-white font-semibold rounded-lg transition duration-200"
+                 download>
+                📎 دانلود فایل
+              </a>
+            {% else %}
+              <p class="text-gray-400 mt-2">هیچ فایلی پیوست نشده است.</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="max-w-screen-lg mx-auto my-5">
+      <h1 class="text-4xl font-extrabold mb-10 text-center text-teal-400 border-b border-teal-600 pb-4">
+        فعالیت‌ها
+      </h1>
+  
+      <div class="bg-gray-800 p-8 rounded-2xl shadow-lg space-y-6">
+        {% if activities %}
+        <ul class="space-y-3">
+          {% for act in activities %}
+            <li class="flex justify-between bg-blue-800 p-3 rounded ">
+              <strong>{{ act.title }}</strong> - {{ act.description }}
+              {% if act.activity_file %}
+                
+                <p>فایل: <a class="text-blue-600 underline" href="{{ act.activity_file.url }}">دانلود</a></p>
+
+                <p>تاریخ: {{act.timeset}}</p>
+              {% endif %}
+              <div class="text-sm text-gray-200 mt-1">
+                ایجاد شده توسط: {{ act.creator.username }}
+              </div>
+              
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="text-gray-500">هنوز هیچ فعالیتی برای این تسک ثبت نشده است.</p>
+      {% endif %}
+      </div>
+
+      <div class="max-w-screen-lg mx-auto my-5">
+        <h1 class="text-4xl font-extrabold mb-10 text-center text-teal-400 border-b border-teal-600 pb-4">
+          ایجاد فعالیت
+        </h1>
+        <div class="bg-gray-800 p-8 rounded-2xl shadow-lg space-y-6">
+          <form method="post" enctype="multipart/form-data" class=" text-white">
+            {% csrf_token %}
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="">
+                  <label for="" class=""> عنوان</label>
+                  {{ activity_form.title|as_crispy_field }}
+                </div>
+                <div class="text-white">
+                  <label for="" class="">برسی توسط</label>
+                  {{ activity_form.review_by|as_crispy_field }}
+                </div>
+                <div class="text-white">
+                  <label for="" class="">وضعیت تسک</label>
+                  {{ activity_form.status|as_crispy_field }}
+                </div>
+
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                <div class="text-white ">
+                  <label for="" class="">اشتراک فایل</label>
+                  {{ activity_form.activity_file|as_crispy_field }}
+                </div>
+                <div class="">
+                  <label for="" class="">توضیحات</label>
+                  {{ activity_form.description|as_crispy_field }}
+                </div>
+
+            </div>
+            <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded">ثبت فعالیت</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    
+    </div>
+  </div>
+  
+
+
+{% endblock %}
