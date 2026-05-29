@@ -1,0 +1,16 @@
+asgiref==3.8.1
+crispy-bootstrap4==2024.10
+crispy-tailwind==1.0.3
+dj-database-url==2.3.0
+Django==5.1.7
+django-crispy-forms==2.3
+django-jalali==7.4.0
+jalali_core==1.0.0
+jdatetime==5.2.0
+persiantools==5.2.0
+pillow==11.2.1
+psycopg2-binary==2.9.10
+pytz==2025.2
+sqlparse==0.5.3
+typing_extensions==4.13.2
+tzdata==2025.1

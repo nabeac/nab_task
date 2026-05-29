@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="icon" href="/media/logo.png" type="image/png">
+
+    <!-- Google Fonts: Vazirmatn for better Persian typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100;400;700&display=swap" rel="stylesheet">
+    
+    <!-- Persian Date Picker CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/css/persian-datepicker.min.css"/>
+    
+    <!-- Tailwind CSS 4 -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+    <style>
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+        }
+        .scrollable-box {
+            max-height: 150px;
+            overflow-y: auto;
+        }
+        /* Glassmorphism Effect for Navbar */
+        .glass-nav {
+            background: rgba(20, 184, 166, 0.9);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+    </style>
+
+    <!-- jQuery & Persian Date -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/persian-date/dist/persian-date.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/persian-datepicker/dist/js/persian-datepicker.min.js"></script>
+</head>
+
+<body class="bg-slate-50 min-h-screen flex flex-col">
+
+    <!-- Navigation -->
+    <nav class="glass-nav sticky top-0 z-50 text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logo Section -->
+                <div class="flex items-center gap-4">
+                    <a href="{% url 'home:list_task' %}" class="flex items-center group">
+                        <div class="bg-white p-2 rounded-lg group-hover:rotate-12 transition-transform duration-300">
+                            <img class="w-8" src="/media/logo.png" alt="">
+                        </div>
+                        <span class="mr-3 font-bold text-xl tracking-tight">ناب تسک</span>
+                    </a>
+
+                    <!-- Desktop Links -->
+                    <div class="hidden md:flex items-center gap-6 mr-8">
+                        <a href="{% url 'home:task_create' %}" class="hover:text-teal-100 transition-colors">تسک جدید</a>
+                        <a href="#" class="hover:text-teal-100 transition-colors">ادمین</a>
+                        <a href="#" class="hover:text-teal-100 transition-colors">بلاگ</a>
+                    </div>
+                </div>
+
+                <!-- User Profile Dropdown -->
+                <div class="flex items-center gap-4">
+                    <div id="today-badge" class="hidden lg:block bg-teal-600/50 px-3 py-1 rounded-full text-xs">
+                        <!-- Date via JS -->
+                    </div>
+                    
+                    <div class="relative group">
+                        <button class="flex items-center gap-2 bg-teal-600 hover:bg-teal-700 px-4 py-2 rounded-xl transition-all border border-teal-400/30 shadow-sm">
+                            <span class="text-sm font-medium">{{ request.user.get_full_name|default:"کاربر مهمان" }}</span>
+                            <svg class="w-4 h-4 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </button>
+                        
+                        <!-- Dropdown Menu -->
+                        <div class="absolute left-0 mt-2 w-48 bg-white rounded-2xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform origin-top-right border border-gray-100 overflow-hidden">
+                            <a href="#" class="block px-4 py-3 text-sm text-gray-700 hover:bg-teal-50 transition-colors border-b border-gray-50">پروفایل کاربری</a>
+                            <form action="{% url 'accounts:logout' %}" method="post">
+                                {% csrf_token %}
+                                <button class="w-full text-right block px-4 py-3 text-sm text-red-500 hover:bg-red-50 transition-colors">خروج از حساب</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Wrapper -->
+    <main class="flex-grow container mx-auto px-4 py-8">
+        <div class="max-w-5xl mx-auto">
+            {% block task %}
+                <!-- محتوای صفحات اینجا قرار می‌گیرد -->
+            {% endblock %}
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-300">
+        <div class="max-w-7xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                <div class="text-center md:text-right">
+                    <h2 class="text-3xl font-black text-white mb-4">منظم باشید، سریع‌تر برسید</h2>
+                    <p class="text-gray-400 max-w-md ml-auto">
+                        سامانه هوشمند مدیریت تسک «ناب تسک» برای کسانی که به زمان خود اهمیت می‌دهند.
+                    </p>
+                    <div class="mt-8 flex flex-wrap justify-center md:justify-start gap-4">
+                        <a href="#" class="px-8 py-3 bg-teal-600 hover:bg-teal-500 text-white rounded-full font-bold transition-all shadow-lg shadow-teal-900/20">شروع رایگان</a>
+                        <div class="flex items-center gap-4 mr-4">
+                            <!-- Social Icons Simplified -->
+                            <a href="#" class="hover:text-teal-400 transition-colors"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849s-.012 3.584-.069 4.849c-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07s-3.584-.012-4.849-.07c-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849s.012-3.584.07-4.849c.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948s.014 3.667.072 4.947c.2 4.337 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072s3.667-.014 4.947-.072c4.337-.2 6.78-2.618 6.98-6.98.058-1.28.072-1.689.072-4.948s-.014-3.667-.072-4.947c-.2-4.338-2.617-6.78-6.98-6.98-1.28-.058-1.689-.072-4.948-.072zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg></a>
+                            <a href="#" class="hover:text-teal-400 transition-colors"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.042-1.416-4.042-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="border-t border-gray-800 pt-8 md:border-t-0 md:pt-0">
+                    <ul class="flex flex-wrap justify-center md:justify-end gap-6 text-sm">
+                        <li><a href="#" class="hover:text-white transition-colors">شرایط استفاده</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">حریم خصوصی</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">درباره ما</a></li>
+                    </ul>
+                    <p class="text-center md:text-left mt-6 text-xs text-gray-500">
+                        &copy; ۲۰۲۴ ناب تسک. تمامی حقوق محفوظ است.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Set Today's Date in Persian
+        const today = new persianDate().format('dddd DD MMMM YYYY');
+        const badge = document.getElementById('today-badge');
+        if(badge) badge.innerText = "امروز: " + today;
+    </script>
+</body>
+</html>

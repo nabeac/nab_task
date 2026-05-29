@@ -1,0 +1,109 @@
+{% extends 'index.html' %}
+{% load humanize %}
+
+{% block title %}
+    تسک‌ها
+{% endblock %}
+
+{% block task %}
+<div class="max-w-4xl mx-auto py-8 px-4">
+    
+    <!-- خوش‌آمدگویی ساده -->
+    <div class="text-center mb-10">
+        <h1 class="text-2xl font-bold text-gray-800">خوش آمدید</h1>
+        <div id="today" class="text-gray-500 mt-2"></div>
+    </div>
+
+    <!-- بخش فیلتر و جستجو -->
+    <form method="get" class="bg-white shadow-md rounded-2xl border border-gray-100 p-4 mb-8">
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
+
+        <div class="md:col-span-5">
+            <input
+                type="text"
+                name="q"
+                value="{{ request.GET.q|default:'' }}"
+                placeholder="جستجو در عنوان، توضیحات، نام افراد..."
+                class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none text-sm"
+            >
+        </div>
+
+        <div class="md:col-span-3">
+            <select name="filter_type" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-teal-500 outline-none text-sm bg-white">
+                <option value="all" {% if request.GET.filter_type == 'all' or not request.GET.filter_type %}selected{% endif %}>همه تسک‌ها</option>
+                <option value="mine" {% if request.GET.filter_type == 'mine' %}selected{% endif %}>تسک‌های من</option>
+            </select>
+        </div>
+
+        <div class="md:col-span-3">
+            <select name="status" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-teal-500 outline-none text-sm bg-white">
+                <option value="">همه وضعیت‌ها</option>
+                <option value="in_progress" {% if request.GET.status == 'in_progress' %}selected{% endif %}>درحال بررسی</option>
+                <option value="working" {% if request.GET.status == 'working' %}selected{% endif %}>در حال انجام</option>
+                <option value="done" {% if request.GET.status == 'done' %}selected{% endif %}>تکمیل شده</option>
+                <option value="error" {% if request.GET.status == 'error' %}selected{% endif %}>به مشکل خورد</option>
+                <option value="rejected" {% if request.GET.status == 'rejected' %}selected{% endif %}>رد شده</option>
+            </select>
+        </div>
+
+        <div class="md:col-span-1">
+            <button type="submit" class="w-full bg-teal-600 hover:bg-teal-700 text-white px-4 py-3 rounded-xl transition-all">
+                فیلتر
+            </button>
+        </div>
+    </div>
+</form>
+
+
+    <!-- لیست تسک‌ها (دقیقا همان ساختار شما) -->
+    {% for task in task %}
+        <div class="bg-white shadow-lg rounded-2xl overflow-hidden mb-8 border border-gray-100 transition-transform hover:scale-[1.01]">
+            
+            <!-- هدر کارت با رنگ داینامیک -->
+            <div class="px-6 py-4 bg-{{ task.get_status_color|default:'teal-500' }} text-white flex justify-between items-center shadow-inner">
+                <span class="font-bold text-lg">{{ task.title }}</span>
+                <a href="{% url 'home:task_view' task.pk %}" class="bg-white/20 hover:bg-white/30 px-5 py-2 rounded-xl text-sm font-bold backdrop-blur-sm transition-all">
+                    نمایش جزئیات
+                </a>
+            </div>
+
+            <!-- محتوای کارت -->
+            <div class="p-6">
+                <ul class="space-y-4">
+                    <li class="flex items-center justify-between pb-3 border-b border-gray-50">
+                        <span class="text-gray-500 text-sm font-semibold">زمان اجرا:</span>
+                        <span class="text-gray-800 font-medium">{{ task.start_time }}</span>
+                    </li>
+                    <li class="flex items-center justify-between pb-3 border-b border-gray-50">
+                        <span class="text-gray-500 text-sm font-semibold">ایجاد کننده:</span>
+                        <span class="text-gray-800 font-medium">{{ task.creator }}</span>
+                    </li>
+                    <li class="flex items-center justify-between pb-3 border-b border-gray-50">
+                        <span class="text-gray-500 text-sm font-semibold">انجام دهنده:</span>
+                        <span class="text-gray-800 font-medium">{{ task.main_responsible }}</span>
+                    </li>
+                    <li class="flex items-center justify-between">
+                        <span class="text-gray-500 text-sm font-semibold">وضعیت فعلی:</span>
+                        <span class="px-3 py-1 rounded-lg bg-gray-100 text-gray-700 text-xs font-bold">{{ task.status }}</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    {% empty %}
+        <div class="text-center py-20 bg-white rounded-3xl border-2 border-dashed border-gray-200">
+            <p class="text-gray-500 italic">هیچ تسکی برای نمایش وجود ندارد.</p>
+        </div>
+    {% endfor %}
+
+</div>
+
+<script>
+    // نمایش تاریخ در بخش خوش‌آمدگویی
+    document.addEventListener('DOMContentLoaded', function() {
+        const todayElement = document.getElementById('today');
+        if (todayElement) {
+            todayElement.innerText = new persianDate().format('dddd DD MMMM YYYY');
+        }
+    });
+</script>
+{% endblock %}

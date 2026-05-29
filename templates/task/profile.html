@@ -1,0 +1,38 @@
+{% extends 'index.html' %}
+{% load humanize %}
+
+{% block title %}
+    تسک های من
+{% endblock %}
+
+{% block task %}
+
+    {% for user_task in task %}
+        <div class="max-w-md mx-auto bg-white shadow-md rounded-md overflow-hidden my-20">
+            <div class="px-4 py-2 bg{{task.condition.color}} text-white font-semibold flex justify-between items-center">
+              <span>{{task.title}}</span>
+              <a href="{% url 'task_view' task.pk %}">
+                <button class="p-2 focus:outline-none hover:bg-teal-600">
+                  نمایش
+                </button>
+              </a>
+            </div>
+            <div class="p-4">
+              <ul class="divide-y divide-gray-200">
+                <li class="py-1">
+                  <p class="text-sm text-gray-600"><span class="font-semibold">زمان اجرا:</span>  {{task.m_date | naturalday}}</p>
+                </li>
+                <li class="py-1">
+                  <p class="text-sm text-gray-600"><span class="font-semibold">ایجاد کننده:</span>  {{task.creator}}</p>
+                </li>
+                <li class="py-1">
+                  <p class="text-sm text-gray-600"><span class="font-semibold">انجام دهنده:</span>  {{task.subject}}</p>
+                </li>
+                <li class="py-1">
+                  <p class="text-sm text-gray-600"><span class="font-semibold">وضعیت:</span>  {{task.condition.condition_name}}</p>
+                </li>
+              </ul>
+            </div>
+          </div>
+    {% endfor %}
+{% endblock %}

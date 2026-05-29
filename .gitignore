@@ -1,0 +1,46 @@
+# ---- Django / Python ---- #djh301
+__pycache__/
+*.py[cod]
+*$py.class
+*.log
+
+# Django generated files
+*.mo
+*.pot
+
+# ---- Environments ---- #djh302
+.env
+.env.*
+venv/
+.venv/
+ENV/
+env/
+
+# ---- Django local settings ---- #djh303
+local_settings.py
+settings_local.py
+
+# ---- Database ---- #djh304
+*.sqlite3
+db.sqlite3
+
+# ---- Media uploads ---- #djh305
+media/
+
+# ---- Static (optional) ---- #djh306
+staticfiles/
+static/
+
+# ---- Caches / tooling ---- #djh307
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+.ruff_cache/
+
+# ---- IDE ---- #djh308
+.vscode/
+.idea/
+*.swp
+.DS_Store
+
