@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}{% endblock %}</title>
-    <link rel="icon" href="/media/logo.png" type="image/png">
 
     <!-- Google Fonts: Vazirmatn for better Persian typography -->
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100;400;700&display=swap" rel="stylesheet">
@@ -47,7 +46,9 @@
                 <div class="flex items-center gap-4">
                     <a href="{% url 'home:list_task' %}" class="flex items-center group">
                         <div class="bg-white p-2 rounded-lg group-hover:rotate-12 transition-transform duration-300">
-                            <img class="w-8" src="/media/logo.png" alt="">
+                            <svg class="text-teal-600 h-6 w-6" fill="currentColor" viewBox="0 0 54 54">
+                                <path d="M13.5 22.1c1.8-7.2 6.3-10.8 13.5-10.8 10.8 0 12.15 8.1 17.55 9.45 3.6.9 6.75-.45 9.45-4.05-1.8 7.2-6.3 10.8-13.5 10.8-10.8 0-12.15-8.1-17.55-9.45-3.6-.9-6.75.45-9.45 4.05zM0 38.3c1.8-7.2 6.3-10.8 13.5-10.8 10.8 0 12.15 8.1 17.55 9.45 3.6.9 6.75-.45 9.45-4.05-1.8 7.2-6.3 10.8-13.5 10.8-10.8 0-12.15-8.1-17.55-9.45-3.6-.9-6.75.45-9.45 4.05z"/>
+                            </svg>
                         </div>
                         <span class="mr-3 font-bold text-xl tracking-tight">ناب تسک</span>
                     </a>
