@@ -79,8 +79,32 @@ class Activity(models.Model):
 
     status = models.CharField(max_length=20, choices=STATUS_CHOICES)
 
-    
 
+
+class Course(models.Model):
+    name = models.CharField(max_length=50)
+    body = models.TextField(default='.', blank=True)
+    start_date = jmodels.jDateField()
+    end_date = jmodels.jDateField()
+    hours = models.DecimalField(max_digits=6, decimal_places=2)
+    videos = models.DecimalField(max_digits=6, decimal_places=2)
+    student = models.ForeignKey(User, related_name='student_cr', on_delete=models.CASCADE)
+
+
+    def __str__(self):
+        return self.name
+
+
+class Report(models.Model):
+    student = models.ForeignKey(User, related_name='student_re', on_delete=models.CASCADE)
+    day = jmodels.jDateField()
+    course = models.ForeignKey(Course, related_name='course_re', on_delete=models.CASCADE)
+    videos_number = models.DecimalField(max_digits=6, decimal_places=2)
+    hours_number = models.DecimalField(max_digits=6, decimal_places=2)
+    body = models.TextField(default='.', blank=True)
+
+    def __str__(self):
+        return f'{self.course} - {self.student}'
 
 # class Communication(models.Model):
 #     comment = models.CharField(max_length=100)

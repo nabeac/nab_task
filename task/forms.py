@@ -1,12 +1,25 @@
 from django import forms
-from .models import Task, Activity
+from .models import Task, Activity, Report, Course
 import django_jalali.forms as jforms 
 
 class TaskForm(forms.ModelForm):
 
     class Meta:
         model = Task
-        exclude  = ['start_date', 'end_date']
+        exclude  = ['creator', 'start_date', 'end_date']
+
+
+
+class ReportForm(forms.ModelForm):
+    def __init__(self, *args, user=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        if user is not None:
+            self.fields['course'].queryset = Course.objects.filter(student=user)
+
+    class Meta:
+        model = Report
+        exclude = ['student', 'day']
+
 
 
 

@@ -1,12 +1,13 @@
 from django.shortcuts import render, redirect
+from django.utils import timezone
 from django.views.generic import CreateView ,DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.contrib.auth.decorators import login_required
 from persiantools.jdatetime import JalaliDate
 from account.models import User
-from .models import Task, Activity
-from .forms import TaskForm ,ActivityForm
+from .models import Task, Activity, Report
+from .forms import TaskForm ,ActivityForm, ReportForm
 from django.db.models import Q
 
 @login_required
@@ -102,6 +103,9 @@ class TaskCreateView(LoginRequiredMixin, CreateView):
 
 # اینجا اون دوتا فیلی که برای زمان هست به سمتش ارسال میشه و میگیره فرمتش میکنه و میفرسته سمت مدل
     def form_valid(self, form):
+
+        form.instance.creator = self.request.user
+        
         start_jalali = self.request.POST.get('start_date')
         end_jalali = self.request.POST.get('end_date')
 
@@ -113,6 +117,25 @@ class TaskCreateView(LoginRequiredMixin, CreateView):
             y, m, d = map(int, end_jalali.split('/'))
             form.instance.end_date = JalaliDate(y, m, d).to_gregorian()
 
+        return super().form_valid(form)
+    
+class ReportCreateView(LoginRequiredMixin, CreateView):
+    model = Report
+    form_class = ReportForm
+    template_name = 'task/report_form.html'
+    success_url = reverse_lazy('home:list_task')
+
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
+# اینجا اون دوتا فیلی که برای زمان هست به سمتش ارسال میشه و میگیره فرمتش میکنه و میفرسته سمت مدل
+    def form_valid(self, form):
+
+        form.instance.student = self.request.user
+        form.instance.day = timezone.localdate()
         return super().form_valid(form)
 
 

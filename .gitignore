@@ -23,9 +23,10 @@ settings_local.py
 # ---- Database ---- #djh304
 *.sqlite3
 db.sqlite3
-
+nabeaccount.zip
 # ---- Media uploads ---- #djh305
 media/
+database/
 
 # ---- Static (optional) ---- #djh306
 staticfiles/
