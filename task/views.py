@@ -48,6 +48,8 @@ def task_list(request):
         ).distinct()
 
     return render(request, 'task/task_list.html', {'task': tasks})
+
+
 class TaskView(LoginRequiredMixin, DetailView):
     model = Task
     queryset = Task.objects.all()
@@ -141,7 +143,14 @@ class ReportCreateView(LoginRequiredMixin, CreateView):
 
 
 
-        
+class ProfileView(LoginRequiredMixin, DetailView):
+    model = User
+    context_object_name = 'profile_view'
+    template_name = 'task/profile.html'
+
+    def get_object(self, queryset=None):
+        return self.request.user
+
         
 
 

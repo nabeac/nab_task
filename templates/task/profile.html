@@ -2,37 +2,455 @@
 {% load humanize %}
 
 {% block title %}
-    تسک های من
+تسک های من
 {% endblock %}
 
 {% block task %}
 
-    {% for user_task in task %}
-        <div class="max-w-md mx-auto bg-white shadow-md rounded-md overflow-hidden my-20">
-            <div class="px-4 py-2 bg{{task.condition.color}} text-white font-semibold flex justify-between items-center">
-              <span>{{task.title}}</span>
-              <a href="{% url 'task_view' task.pk %}">
-                <button class="p-2 focus:outline-none hover:bg-teal-600">
-                  نمایش
-                </button>
-              </a>
-            </div>
-            <div class="p-4">
-              <ul class="divide-y divide-gray-200">
-                <li class="py-1">
-                  <p class="text-sm text-gray-600"><span class="font-semibold">زمان اجرا:</span>  {{task.m_date | naturalday}}</p>
-                </li>
-                <li class="py-1">
-                  <p class="text-sm text-gray-600"><span class="font-semibold">ایجاد کننده:</span>  {{task.creator}}</p>
-                </li>
-                <li class="py-1">
-                  <p class="text-sm text-gray-600"><span class="font-semibold">انجام دهنده:</span>  {{task.subject}}</p>
-                </li>
-                <li class="py-1">
-                  <p class="text-sm text-gray-600"><span class="font-semibold">وضعیت:</span>  {{task.condition.condition_name}}</p>
-                </li>
-              </ul>
-            </div>
+
+
+<!-- Container -->
+<!-- <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10"> -->
+
+<!-- Header & Profile Info -->
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10">
+
+  <!-- User Main Card -->
+  <div class="lg:col-span-1 glass-card rounded-3xl p-8 flex flex-col items-center text-center shadow-xl">
+    <div class="relative">
+      {% if profile_view.avatar %}
+      <img src="{{ profile_view.avatar.ur }}" alt="avatar" class="w-32 h-32 rounded-full border-4 border-teal-500 p-1 shadow-lg shadow-teal-500/20">
+      {% elif profile_view.get_full_name %}
+      <img
+        src="https://ui-avatars.com/api/?name={{ profile_view.get_full_name|urlencode }}&background=0D9488&color=fff&size=128"
+        alt="avatar" class="w-32 h-32 rounded-full border-4 border-teal-500 p-1 shadow-lg shadow-teal-500/20">
+      {% else %}
+      <img
+        src="https://ui-avatars.com/api/?name={{ profile_view.username|urlencode }}&background=0D9488&color=fff&size=128"
+        alt="avatar" class="w-32 h-32 rounded-full border-4 border-teal-500 p-1 shadow-lg shadow-teal-500/20">
+      {% endif %}
+
+
+      <span class="absolute bottom-2 right-2 w-6 h-6 bg-green-500 border-4 border-white rounded-full"></span>
+    </div>
+
+    <h2 class="text-2xl font-black mt-4 text-slate-900">{{ profile_view.get_full_name }}
+    </h2>
+    <p class="text-teal-700 font-semibold">مدیر پروژه / برنامه نویس ارشد</p>
+
+    <div class="flex gap-4 mt-6">
+      <div class="text-center px-4">
+        <span class="block text-xl font-extrabold text-slate-900">{{ profile_view.get_task_summary.total }}
+        </span>
+        <span class="text-xs text-slate-500">تسک کل</span>
+      </div>
+      <div class="w-px h-10 bg-slate-200"></div>
+      <div class="text-center px-4">
+        <span class="block text-xl font-extrabold text-slate-900">{{ profile_view.get_task_summary.working }}
+        </span>
+        <span class="text-xs text-slate-500">در حال انجام</span>
+      </div>
+      <div class="w-px h-10 bg-slate-200"></div>
+      <div class="text-center px-4">
+        <span class="block text-xl font-extrabold text-slate-900">{{ profile_view.get_task_summary.done }}
+        </span>
+        <span class="text-xs text-slate-500">انجام شده</span>
+      </div>
+    </div>
+
+    <div class="w-full mt-8 space-y-3 text-right">
+      <div class="flex items-center text-sm text-slate-600">
+        <i class="fas fa-envelope w-8 text-teal-600"></i>
+        <span>{{ profile_view.email }}
+        </span>
+      </div>
+      <div class="flex items-center text-sm text-slate-600">
+        <i class="fas fa-phone w-8 text-teal-600"></i>
+        <span dir="ltr">{{ profile_view.phone }}
+        </span>
+      </div>
+      <div class="flex items-center text-sm text-slate-600">
+        <i class="fas fa-calendar-alt w-8 text-teal-600"></i>
+        <span>{{ profile_view.date_joined }}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Performance Stats -->
+  <div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
+    <!-- Status Distribution -->
+    <div class="glass-card rounded-3xl p-6 shadow-xl">
+      <h3 class="text-lg font-extrabold mb-4 flex items-center text-slate-900">
+        <i class="fas fa-chart-pie ml-2 text-teal-600"></i> وضعیت کلی تسک‌ها
+      </h3>
+
+      <div class="space-y-4">
+        <div>
+          <div class="flex justify-between text-xs mb-1 text-slate-600">
+            <span>تکمیل شده</span>
+            <span class="text-teal-700 font-bold">۷۵٪</span>
           </div>
-    {% endfor %}
+          <div class="w-full bg-slate-200 rounded-full h-2">
+            <div class="bg-teal-600 h-2 rounded-full" style="width: 75%"></div>
+          </div>
+        </div>
+
+        <div>
+          <div class="flex justify-between text-xs mb-1 text-slate-600">
+            <span>در حال بررسی</span>
+            <span class="text-amber-600 font-bold">۱۵٪</span>
+          </div>
+          <div class="w-full bg-slate-200 rounded-full h-2">
+            <div class="bg-amber-500 h-2 rounded-full" style="width: 15%"></div>
+          </div>
+        </div>
+
+        <div>
+          <div class="flex justify-between text-xs mb-1 text-slate-600">
+            <span>معوقه (تاخیر خورده)</span>
+            <span class="text-rose-600 font-bold">۱۰٪</span>
+          </div>
+          <div class="w-full bg-slate-200 rounded-full h-2">
+            <div class="bg-rose-500 h-2 rounded-full" style="width: 10%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Monthly Activity -->
+    <div class="glass-card rounded-3xl p-6 flex flex-col justify-between shadow-xl">
+      <h3 class="text-lg font-extrabold mb-2 flex items-center text-slate-900">
+        <i class="fas fa-bolt ml-2 text-amber-500"></i> فعالیت ماه اخیر
+      </h3>
+
+      <div class="text-4xl font-black text-slate-900">
+        ۲۸ <span class="text-sm font-normal text-slate-500">تسک بسته شده</span>
+      </div>
+
+      <p class="text-emerald-600 text-sm mt-1">
+        <i class="fas fa-arrow-up ml-1"></i> ۱۲٪ افزایش نسبت به ماه قبل
+      </p>
+
+      <div class="mt-6 flex items-end gap-2 h-20">
+        <div class="bg-teal-600/20 hover:bg-teal-600 w-full h-12 rounded-t-md transition-all"></div>
+        <div class="bg-teal-600/20 hover:bg-teal-600 w-full h-16 rounded-t-md transition-all"></div>
+        <div class="bg-teal-600/20 hover:bg-teal-600 w-full h-8 rounded-t-md transition-all"></div>
+        <div class="bg-teal-600/20 hover:bg-teal-600 w-full h-20 rounded-t-md transition-all"></div>
+        <div class="bg-teal-600 w-full h-14 rounded-t-md"></div>
+      </div>
+    </div>
+
+    <!-- Special Badges -->
+    <div class="md:col-span-2 glass-card rounded-3xl p-6 shadow-xl">
+      <h3 class="text-lg font-extrabold mb-4 text-slate-600">دستاوردهای افتخاری</h3>
+
+      <div class="flex flex-wrap gap-4">
+        <div
+          class="flex items-center gap-2 bg-amber-50 px-4 py-2 rounded-full border border-amber-200 text-amber-700 shadow-sm">
+          <i class="fas fa-medal"></i>
+          <span class="text-sm font-bold">وقت شناس (۱۰ تسک بدون تاخیر)</span>
+        </div>
+        <div
+          class="flex items-center gap-2 bg-sky-50 px-4 py-2 rounded-full border border-sky-200 text-sky-700 shadow-sm">
+          <i class="fas fa-fire"></i>
+          <span class="text-sm font-bold">پرتلاش هفته</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Training Report Section -->
+<div class="glass-card rounded-3xl p-6 mb-10 shadow-xl">
+  <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+    <div>
+      <h3 class="text-xl font-black text-slate-900">گزارش آموزش</h3>
+      <p class="text-sm text-slate-500 mt-1">دوره را انتخاب کنید تا میزان پیشرفت نمایش داده شود.</p>
+    </div>
+
+    <div class="flex gap-2 items-center">
+      <label class="text-sm text-slate-600 font-bold">انتخاب دوره:</label>
+      <select
+        class="bg-white border border-slate-200 rounded-xl text-sm px-4 py-2 focus:ring-2 ring-teal-500 outline-none">
+        <option>دوره جنگو (مقدماتی)</option>
+        <option>دوره ری‌اکت</option>
+        <option>دوره الگوریتم</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Top KPIs -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+    <!-- Videos Watched -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-5">
+      <div class="flex items-center justify-between">
+        <div>
+          <div class="text-xs text-slate-500 font-bold">ویدیوهای دیده‌شده</div>
+          <div class="text-3xl font-black text-slate-900 mt-1">۳۲ <span class="text-sm font-normal text-slate-500">از
+              ۵۰</span></div>
+        </div>
+        <div class="w-12 h-12 rounded-2xl bg-teal-50 text-teal-700 flex items-center justify-center">
+          <i class="fas fa-play"></i>
+        </div>
+      </div>
+
+      <div class="mt-4">
+        <div class="flex justify-between text-xs text-slate-600 mb-1">
+          <span>پیشرفت</span>
+          <span class="font-bold text-teal-700">۶۴٪</span>
+        </div>
+        <div class="w-full bg-slate-200 rounded-full h-2">
+          <div class="bg-teal-600 h-2 rounded-full" style="width: 64%"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hours Watched -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-5">
+      <div class="flex items-center justify-between">
+        <div>
+          <div class="text-xs text-slate-500 font-bold">ساعات مشاهده‌شده</div>
+          <div class="text-3xl font-black text-slate-900 mt-1">۱۸٫۵ <span
+              class="text-sm font-normal text-slate-500">ساعت</span></div>
+        </div>
+        <div class="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-700 flex items-center justify-center">
+          <i class="fas fa-clock"></i>
+        </div>
+      </div>
+
+      <p class="text-xs text-slate-500 mt-4">
+        میانگین روزانه: <span class="font-bold text-slate-700">۴۵ دقیقه</span>
+      </p>
+    </div>
+
+    <!-- Days Gap Metric -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-5">
+      <div class="flex items-center justify-between">
+        <div>
+          <div class="text-xs text-slate-500 font-bold">اختلاف روزها (Consistency)</div>
+          <div class="text-3xl font-black text-slate-900 mt-1">۳ <span
+              class="text-sm font-normal text-slate-500">روز</span></div>
+        </div>
+        <div class="w-12 h-12 rounded-2xl bg-rose-50 text-rose-700 flex items-center justify-center">
+          <i class="fas fa-calendar-day"></i>
+        </div>
+      </div>
+
+      <p class="text-xs text-slate-500 mt-4">
+        بیشترین فاصله در این ماه: <span class="font-bold text-rose-700">۷ روز</span>
+      </p>
+    </div>
+  </div>
+
+  <!-- Charts -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+    <!-- Progress donut (static placeholder) -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-5 lg:col-span-1">
+      <div class="flex items-center justify-between mb-3">
+        <h4 class="font-extrabold text-slate-900">پیشرفت کلی دوره</h4>
+        <span class="text-xs font-bold text-teal-700 bg-teal-50 px-3 py-1 rounded-full">۶۴٪</span>
+      </div>
+
+      <div class="flex items-center justify-center py-6">
+        <!-- SVG donut chart (static) -->
+        <svg width="140" height="140" viewBox="0 0 120 120" class="progress-ring">
+          <circle cx="60" cy="60" r="46" fill="none" stroke="#e2e8f0" stroke-width="12"></circle>
+          <!-- 64% -->
+          <circle cx="60" cy="60" r="46" fill="none" stroke="#0d9488" stroke-width="12" stroke-linecap="round"
+            stroke-dasharray="289" stroke-dashoffset="104"></circle>
+        </svg>
+      </div>
+
+      <div class="text-center text-sm text-slate-600">
+        <div>باقی‌مانده: <span class="font-bold">۱۸ ویدیو</span></div>
+      </div>
+    </div>
+
+    <!-- Daily watched hours (bar chart placeholder) -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-5 lg:col-span-2">
+      <div class="flex items-center justify-between mb-3">
+        <h4 class="font-extrabold text-slate-900">ساعات مشاهده (۷ روز اخیر)</h4>
+        <span class="text-xs text-slate-500">واحد: ساعت</span>
+      </div>
+
+      <div class="mt-6 flex items-end gap-2 h-28">
+        <!-- bars (static demo) -->
+        <div class="w-full rounded-t-md bg-teal-600/20 hover:bg-teal-600 transition-all h-10"></div>
+        <div class="w-full rounded-t-md bg-teal-600/20 hover:bg-teal-600 transition-all h-20"></div>
+        <div class="w-full rounded-t-md bg-teal-600/20 hover:bg-teal-600 transition-all h-14"></div>
+        <div class="w-full rounded-t-md bg-teal-600/20 hover:bg-teal-600 transition-all h-24"></div>
+        <div class="w-full rounded-t-md bg-teal-600/20 hover:bg-teal-600 transition-all h-8"></div>
+        <div class="w-full rounded-t-md bg-teal-600/20 hover:bg-teal-600 transition-all h-16"></div>
+        <div class="w-full rounded-t-md bg-teal-600 h-22"></div>
+      </div>
+
+      <div class="mt-4 grid grid-cols-7 text-[10px] text-slate-500">
+        <span class="text-center">ش</span>
+        <span class="text-center">ی</span>
+        <span class="text-center">د</span>
+        <span class="text-center">س</span>
+        <span class="text-center">چ</span>
+        <span class="text-center">پ</span>
+        <span class="text-center">ج</span>
+      </div>
+    </div>
+
+    <!-- "نمودار میلی اختلاف روز ها" (sparkline placeholder) -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-5 lg:col-span-3">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 mb-3">
+        <h4 class="font-extrabold text-slate-900">نمودار اختلاف روزها (میلی/ریز)</h4>
+        <p class="text-xs text-slate-500">نمایش فاصله روزهای مطالعه (هرچه پایین‌تر بهتر)</p>
+      </div>
+
+      <!-- simple sparkline (static SVG) -->
+      <div class="w-full overflow-x-auto">
+        <svg viewBox="0 0 600 120" class="w-full h-28">
+          <!-- grid -->
+          <path d="M0 100 H600" stroke="#e2e8f0" />
+          <path d="M0 70 H600" stroke="#f1f5f9" />
+          <path d="M0 40 H600" stroke="#f1f5f9" />
+          <path d="M0 10 H600" stroke="#f1f5f9" />
+
+          <!-- area -->
+          <path d="M10 90
+                       C 70 60, 110 95, 170 70
+                       S 270 80, 330 50
+                       S 430 85, 490 65
+                       S 560 75, 590 40
+                       L 590 110 L10 110 Z" fill="rgba(13, 148, 136, 0.12)" />
+
+          <!-- line -->
+          <path d="M10 90
+                       C 70 60, 110 95, 170 70
+                       S 270 80, 330 50
+                       S 430 85, 490 65
+                       S 560 75, 590 40" fill="none" stroke="#0d9488" stroke-width="3" stroke-linecap="round" />
+
+          <!-- points -->
+          <circle cx="10" cy="90" r="4" fill="#0d9488" />
+          <circle cx="170" cy="70" r="4" fill="#0d9488" />
+          <circle cx="330" cy="50" r="4" fill="#0d9488" />
+          <circle cx="490" cy="65" r="4" fill="#0d9488" />
+          <circle cx="590" cy="40" r="4" fill="#0d9488" />
+        </svg>
+      </div>
+
+      <div class="mt-2 text-xs text-slate-600 flex flex-wrap gap-4">
+        <span>کمترین فاصله: <b class="text-emerald-700">۰ روز</b></span>
+        <span>میانگین فاصله: <b class="text-slate-800">۲.۱ روز</b></span>
+        <span>بیشترین فاصله: <b class="text-rose-700">۷ روز</b></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- History of All Tasks Table -->
+<div class="glass-card rounded-3xl overflow-hidden shadow-xl">
+  <div class="p-6 border-b border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <h3 class="text-xl font-black text-slate-900">تاریخچه کامل تسک‌های زندگی کاری</h3>
+    <div class="flex gap-2">
+      <select
+        class="bg-white border border-slate-200 rounded-xl text-sm px-4 py-2 focus:ring-2 ring-teal-500 outline-none">
+        <option>همه وضعیت‌ها</option>
+        <option>تکمیل شده</option>
+        <option>در حال انجام</option>
+      </select>
+      <button class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-xl text-sm transition font-bold">
+        <i class="fas fa-filter ml-1"></i> فیلتر پیشرفته
+      </button>
+    </div>
+  </div>
+
+  <div class="overflow-x-auto">
+    <table class="w-full text-right border-collapse">
+      <thead>
+        <tr class="bg-slate-100 text-slate-500 text-xs uppercase tracking-wider">
+          <th class="p-4 font-bold">عنوان تسک</th>
+          <th class="p-4 font-bold">تاریخ شروع</th>
+          <th class="p-4 font-bold">مهلت نهایی</th>
+          <th class="p-4 font-bold">وضعیت</th>
+          <th class="p-4 font-bold">امتیاز</th>
+          <th class="p-4 font-bold">عملیات</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-200">
+        <tr class="hover:bg-slate-50 transition-colors">
+          <td class="p-4">
+            <div class="font-bold text-slate-900">طراحی دیتابیس سامانه</div>
+            <div class="text-xs text-slate-500">پروژه بازسازی داخلی</div>
+          </td>
+          <td class="p-4 text-sm text-slate-700">۱۴۰۲/۰۵/۱۰</td>
+          <td class="p-4 text-sm text-slate-700 font-mono">۱۴۰۲/۰۵/۲۵</td>
+          <td class="p-4">
+            <span
+              class="px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200">تکمیل
+              شده</span>
+          </td>
+          <td class="p-4">
+            <div class="flex text-amber-500 text-xs">
+              <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                class="fas fa-star"></i><i class="fas fa-star"></i>
+            </div>
+          </td>
+          <td class="p-4">
+            <button class="text-slate-500 hover:text-slate-900 transition"><i class="fas fa-eye"></i></button>
+          </td>
+        </tr>
+
+        <tr class="hover:bg-slate-50 transition-colors">
+          <td class="p-4">
+            <div class="font-bold text-slate-900">رفع باگ‌های ماژول پرداخت</div>
+            <div class="text-xs text-slate-500">پروژه فروشگاه</div>
+          </td>
+          <td class="p-4 text-sm text-slate-700">۱۴۰۲/۰۶/۰۱</td>
+          <td class="p-4 text-sm text-rose-700 font-mono italic">۱۴۰۲/۰۶/۰۵</td>
+          <td class="p-4">
+            <span class="px-3 py-1 rounded-full bg-rose-50 text-rose-700 text-xs font-bold border border-rose-200">تاخیر
+              خورده</span>
+          </td>
+          <td class="p-4 text-slate-400 text-xs">---</td>
+          <td class="p-4">
+            <button class="text-slate-500 hover:text-slate-900 transition"><i class="fas fa-eye"></i></button>
+          </td>
+        </tr>
+
+        <tr class="hover:bg-slate-50 transition-colors">
+          <td class="p-4">
+            <div class="font-bold text-slate-900">جلسه هماهنگی با کلاینت</div>
+            <div class="text-xs text-slate-500">عمومی</div>
+          </td>
+          <td class="p-4 text-sm text-slate-700">۱۴۰۲/۰۶/۱۰</td>
+          <td class="p-4 text-sm text-slate-700 font-mono">۱۴۰۲/۰۶/۱۱</td>
+          <td class="p-4">
+            <span class="px-3 py-1 rounded-full bg-sky-50 text-sky-700 text-xs font-bold border border-sky-200">در حال
+              انجام</span>
+          </td>
+          <td class="p-4 text-slate-400 text-xs">---</td>
+          <td class="p-4">
+            <button class="text-slate-500 hover:text-slate-900 transition"><i class="fas fa-eye"></i></button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div class="p-6 bg-white/60 flex justify-center border-t border-slate-200">
+    <nav class="flex gap-2">
+      <button
+        class="w-10 h-10 rounded-lg bg-teal-600 text-white flex items-center justify-center hover:bg-teal-700 transition">۱</button>
+      <button
+        class="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center hover:bg-teal-600 hover:text-white transition text-slate-500">۲</button>
+      <button
+        class="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center hover:bg-teal-600 hover:text-white transition text-slate-500">۳</button>
+    </nav>
+  </div>
+</div>
+
+<!-- </div> -->
+
+
+
 {% endblock %}

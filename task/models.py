@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 from extenstios . utils import django_jalali, jalalitime
 import django_jalali.db.models as jmodels
 from account.models import User
@@ -36,6 +37,22 @@ class Task(models.Model):
     ]
 
     status = models.CharField(max_length=20, choices=STATUS_CHOICES)
+    completed_at = models.DateField(null=True, blank=True)
+
+    
+
+    def save(self, *args, **kwargs):
+        old_status = None
+
+        if self.pk:
+            old_status = Task.objects.filter(pk=self.pk).values_list('status', flat=True).first()
+
+        if self.status == 'done' and old_status != 'done' and not self.completed_at:
+            self.completed_at = timezone.localdate()
+
+        super().save(*args, **kwargs)
+
+
 
     def get_status_color(self):
         return {
