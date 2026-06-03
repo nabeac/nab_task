@@ -83,7 +83,7 @@
                         
                         <!-- Dropdown Menu -->
                         <div class="absolute left-0 mt-2 w-48 bg-white rounded-2xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform origin-top-right border border-gray-100 overflow-hidden">
-                            <a href="#" class="block px-4 py-3 text-sm text-gray-700 hover:bg-teal-50 transition-colors border-b border-gray-50">پروفایل کاربری</a>
+                            <a href="{% url 'home:profile' %}" class="block px-4 py-3 text-sm text-gray-700 hover:bg-teal-50 transition-colors border-b border-gray-50">پروفایل کاربری</a>
                             <form action="{% url 'accounts:logout' %}" method="post">
                                 {% csrf_token %}
                                 <button class="w-full text-right block px-4 py-3 text-sm text-red-500 hover:bg-red-50 transition-colors">خروج از حساب</button>

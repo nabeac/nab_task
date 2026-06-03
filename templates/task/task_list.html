@@ -97,6 +97,37 @@
 
 </div>
 
+
+{% if page_obj.paginator.num_pages > 1 %}
+
+<div class="p-6 bg-white/60 flex justify-center border-t border-slate-200">
+
+  <nav class="flex gap-2">
+
+    {% for num in page_obj.paginator.page_range %}
+
+      <a href="?page={{ num }}{% if selected_status %}&status={{ selected_status }}{% endif %}{% if selected_role %}&role={{ selected_role }}{% endif %}#tasks-history"
+
+        class="w-10 h-10 rounded-lg flex items-center justify-center transition
+        {% if page_obj.number == num %}
+        bg-teal-600 text-white
+        {% else %}
+        bg-slate-100 text-slate-500 hover:bg-teal-600 hover:text-white
+        {% endif %}">
+
+        {{ num }}
+
+      </a>
+
+    {% endfor %}
+
+  </nav>
+
+</div>
+
+{% endif %}
+
+
 <script>
     // نمایش تاریخ در بخش خوش‌آمدگویی
     document.addEventListener('DOMContentLoaded', function() {

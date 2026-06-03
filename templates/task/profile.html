@@ -20,7 +20,8 @@
   <div class="lg:col-span-1 glass-card rounded-3xl p-8 flex flex-col items-center text-center shadow-xl">
     <div class="relative">
       {% if profile_view.avatar %}
-      <img src="{{ profile_view.avatar.ur }}" alt="avatar" class="w-32 h-32 rounded-full border-4 border-teal-500 p-1 shadow-lg shadow-teal-500/20">
+      <img src="{{ profile_view.avatar.ur }}" alt="avatar"
+        class="w-32 h-32 rounded-full border-4 border-teal-500 p-1 shadow-lg shadow-teal-500/20">
       {% elif profile_view.get_full_name %}
       <img
         src="https://ui-avatars.com/api/?name={{ profile_view.get_full_name|urlencode }}&background=0D9488&color=fff&size=128"
@@ -81,56 +82,86 @@
   <!-- Performance Stats -->
   <div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
     <!-- Status Distribution -->
+    {% with summary=profile_view.get_task_summary %}
     <div class="glass-card rounded-3xl p-6 shadow-xl">
       <h3 class="text-lg font-extrabold mb-4 flex items-center text-slate-900">
         <i class="fas fa-chart-pie ml-2 text-teal-600"></i> وضعیت کلی تسک‌ها
       </h3>
 
       <div class="space-y-4">
+
+        <!-- done -->
         <div>
           <div class="flex justify-between text-xs mb-1 text-slate-600">
             <span>تکمیل شده</span>
-            <span class="text-teal-700 font-bold">۷۵٪</span>
+            <span class="text-teal-700 font-bold">
+              {% if summary.total %}
+              {% widthratio summary.done summary.total 100 %} %
+              {% else %}0%{% endif %}
+            </span>
           </div>
           <div class="w-full bg-slate-200 rounded-full h-2">
-            <div class="bg-teal-600 h-2 rounded-full" style="width: 75%"></div>
+            <div class="bg-teal-600 h-2 rounded-full"
+              style="width: {% if summary.total %}{% widthratio summary.done summary.total 100 %}%{% else %}0%{% endif %}">
+            </div>
           </div>
         </div>
 
+        <!-- working -->
         <div>
           <div class="flex justify-between text-xs mb-1 text-slate-600">
-            <span>در حال بررسی</span>
-            <span class="text-amber-600 font-bold">۱۵٪</span>
+            <span>در حال انجام</span>
+            <span class="text-green-600 font-bold">
+              {% if summary.total %}
+              {% widthratio summary.working summary.total 100 %} %
+              {% else %}0%{% endif %}
+            </span>
           </div>
           <div class="w-full bg-slate-200 rounded-full h-2">
-            <div class="bg-amber-500 h-2 rounded-full" style="width: 15%"></div>
+            <div class="bg-green-500 h-2 rounded-full"
+              style="width: {% if summary.total %}{% widthratio summary.working summary.total 100 %}%{% else %}0%{% endif %}">
+            </div>
           </div>
         </div>
 
+        <!-- delayed -->
         <div>
           <div class="flex justify-between text-xs mb-1 text-slate-600">
             <span>معوقه (تاخیر خورده)</span>
-            <span class="text-rose-600 font-bold">۱۰٪</span>
+            <span class="text-rose-600 font-bold">
+              {% if summary.total %}
+              {% widthratio summary.delayed summary.total 100 %} %
+              {% else %}0%{% endif %}
+            </span>
           </div>
           <div class="w-full bg-slate-200 rounded-full h-2">
-            <div class="bg-rose-500 h-2 rounded-full" style="width: 10%"></div>
+            <div class="bg-rose-500 h-2 rounded-full"
+              style="width: {% if summary.total %}{% widthratio summary.delayed summary.total 100 %}%{% else %}0%{% endif %}">
+            </div>
           </div>
         </div>
+
       </div>
     </div>
+    {% endwith %}
+
 
     <!-- Monthly Activity -->
+
+    {% with summary=profile_view.get_task_summary %}
     <div class="glass-card rounded-3xl p-6 flex flex-col justify-between shadow-xl">
       <h3 class="text-lg font-extrabold mb-2 flex items-center text-slate-900">
         <i class="fas fa-bolt ml-2 text-amber-500"></i> فعالیت ماه اخیر
       </h3>
 
       <div class="text-4xl font-black text-slate-900">
-        ۲۸ <span class="text-sm font-normal text-slate-500">تسک بسته شده</span>
+        {{ summary.done_this_month }}
+        <span class="text-sm font-normal text-slate-500">تسک بسته شده</span>
       </div>
 
       <p class="text-emerald-600 text-sm mt-1">
-        <i class="fas fa-arrow-up ml-1"></i> ۱۲٪ افزایش نسبت به ماه قبل
+        <i class="fas fa-arrow-up ml-1"></i>
+        فعالیت این ماه
       </p>
 
       <div class="mt-6 flex items-end gap-2 h-20">
@@ -141,9 +172,44 @@
         <div class="bg-teal-600 w-full h-14 rounded-t-md"></div>
       </div>
     </div>
+    {% endwith %}
+
+
+    <div class="relative md:col-span-2 glass-card rounded-3xl p-6 shadow-xl">
+
+      <!-- محتوای اصلی -->
+      <div class="opacity-50 pointer-events-none">
+        <h3 class="text-lg font-extrabold mb-4 text-slate-600">
+          دستاوردهای افتخاری
+        </h3>
+
+        <div class="flex flex-wrap gap-4">
+          <div
+            class="flex items-center gap-2 bg-amber-50 px-4 py-2 rounded-full border border-amber-200 text-amber-700 shadow-sm">
+            <i class="fas fa-medal"></i>
+            <span class="text-sm font-bold">وقت شناس (۱۰ تسک بدون تاخیر)</span>
+          </div>
+
+          <div
+            class="flex items-center gap-2 bg-sky-50 px-4 py-2 rounded-full border border-sky-200 text-sky-700 shadow-sm">
+            <i class="fas fa-fire"></i>
+            <span class="text-sm font-bold">پرتلاش هفته</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- لایه بزودی -->
+      <div class="absolute inset-0 flex items-center justify-center">
+        <span class="bg-black/70 text-white px-6 py-2 rounded-full text-sm font-bold shadow-lg">
+          بزودی
+        </span>
+      </div>
+
+    </div>
+
 
     <!-- Special Badges -->
-    <div class="md:col-span-2 glass-card rounded-3xl p-6 shadow-xl">
+    <!-- <div class="md:col-span-2 glass-card rounded-3xl p-6 shadow-xl">
       <h3 class="text-lg font-extrabold mb-4 text-slate-600">دستاوردهای افتخاری</h3>
 
       <div class="flex flex-wrap gap-4">
@@ -158,7 +224,8 @@
           <span class="text-sm font-bold">پرتلاش هفته</span>
         </div>
       </div>
-    </div>
+    </div> -->
+
   </div>
 </div>
 
@@ -346,108 +413,187 @@
   </div>
 </div>
 
+
 <!-- History of All Tasks Table -->
-<div class="glass-card rounded-3xl overflow-hidden shadow-xl">
+
+<div id="tasks-history" class="glass-card rounded-3xl overflow-hidden shadow-xl">
+
   <div class="p-6 border-b border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
-    <h3 class="text-xl font-black text-slate-900">تاریخچه کامل تسک‌های زندگی کاری</h3>
-    <div class="flex gap-2">
-      <select
-        class="bg-white border border-slate-200 rounded-xl text-sm px-4 py-2 focus:ring-2 ring-teal-500 outline-none">
-        <option>همه وضعیت‌ها</option>
-        <option>تکمیل شده</option>
-        <option>در حال انجام</option>
+    <h3 class="text-xl font-black text-slate-900">
+      تاریخچه کامل تسک‌های من
+    </h3>
+
+    <form method="get" class="flex gap-2" onsubmit="this.action = window.location.pathname + '#tasks-history';">
+
+      <select name="status" class="bg-white border border-slate-200 rounded-xl text-sm px-4 py-2">
+        <option value="">همه وضعیت‌ها</option>
+
+        <option value="done" {% if selected_status == "done" %}selected{% endif %}>
+          تکمیل شده
+        </option>
+
+        <option value="working" {% if selected_status == "working" %}selected{% endif %}>
+          در حال انجام
+        </option>
+
+        <option value="in_progress" {% if selected_status == "in_progress" %}selected{% endif %}>
+          درحال بررسی
+        </option>
+
+        <option value="error" {% if selected_status == "error" %}selected{% endif %}>
+          به مشکل خورده
+        </option>
+
+        <option value="rejected" {% if selected_status == "rejected" %}selected{% endif %}>
+          رد شده
+        </option>
+
       </select>
-      <button class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-xl text-sm transition font-bold">
-        <i class="fas fa-filter ml-1"></i> فیلتر پیشرفته
+
+
+      <select name="role" class="bg-white border border-slate-200 rounded-xl text-sm px-4 py-2">
+
+        <option value="">همه نقش‌ها</option>
+
+        <option value="responsible" {% if selected_role == "responsible" %}selected{% endif %}>
+          مسئول اصلی
+        </option>
+
+        <option value="creator" {% if selected_role == "creator" %}selected{% endif %}>
+          ایجاد کننده
+        </option>
+
+        <option value="review" {% if selected_role == "review" %}selected{% endif %}>
+          نیازمند بررسی من
+        </option>
+
+      </select>
+
+
+      <button type="submit" class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-xl text-sm font-bold">
+        فیلتر
       </button>
-    </div>
+
+    </form>
   </div>
 
+
   <div class="overflow-x-auto">
+
     <table class="w-full text-right border-collapse">
+
       <thead>
         <tr class="bg-slate-100 text-slate-500 text-xs uppercase tracking-wider">
           <th class="p-4 font-bold">عنوان تسک</th>
           <th class="p-4 font-bold">تاریخ شروع</th>
           <th class="p-4 font-bold">مهلت نهایی</th>
           <th class="p-4 font-bold">وضعیت</th>
-          <th class="p-4 font-bold">امتیاز</th>
           <th class="p-4 font-bold">عملیات</th>
         </tr>
       </thead>
+
       <tbody class="divide-y divide-slate-200">
+
+        {% for task in tasks %}
+
         <tr class="hover:bg-slate-50 transition-colors">
+
           <td class="p-4">
-            <div class="font-bold text-slate-900">طراحی دیتابیس سامانه</div>
-            <div class="text-xs text-slate-500">پروژه بازسازی داخلی</div>
-          </td>
-          <td class="p-4 text-sm text-slate-700">۱۴۰۲/۰۵/۱۰</td>
-          <td class="p-4 text-sm text-slate-700 font-mono">۱۴۰۲/۰۵/۲۵</td>
-          <td class="p-4">
-            <span
-              class="px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200">تکمیل
-              شده</span>
-          </td>
-          <td class="p-4">
-            <div class="flex text-amber-500 text-xs">
-              <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
-                class="fas fa-star"></i><i class="fas fa-star"></i>
+            <div class="font-bold text-slate-900">
+              {{ task.title }}
+            </div>
+
+            <div class="text-xs text-slate-500">
+              ایجاد شده توسط {{ task.creator }}
             </div>
           </td>
+
+          <td class="p-4 text-sm text-slate-700">
+            {{ task.start_time }}
+          </td>
+
+          <td class="p-4 text-sm text-slate-700 font-mono">
+            {{ task.end_time }}
+          </td>
+
           <td class="p-4">
-            <button class="text-slate-500 hover:text-slate-900 transition"><i class="fas fa-eye"></i></button>
+
+            {% with color=task.get_status_color %}
+
+            <span class="px-3 py-1 rounded-full text-xs font-bold border
+              bg-{{ color }}/10
+              text-{{ color }}
+              border-{{ color }}/30">
+
+              {{ task.get_status_display }}
+
+            </span>
+
+            {% endwith %}
+
+          </td>
+
+          <td class="p-4">
+
+            <a href="{% url 'home:task_view' task.id %}" class="text-slate-500 hover:text-slate-900 transition">
+
+              <i class="fas fa-eye"></i>
+
+            </a>
+
+          </td>
+
+        </tr>
+
+        {% empty %}
+
+        <tr>
+          <td colspan="5" class="text-center p-10 text-slate-400">
+            تسکی برای نمایش وجود ندارد
           </td>
         </tr>
 
-        <tr class="hover:bg-slate-50 transition-colors">
-          <td class="p-4">
-            <div class="font-bold text-slate-900">رفع باگ‌های ماژول پرداخت</div>
-            <div class="text-xs text-slate-500">پروژه فروشگاه</div>
-          </td>
-          <td class="p-4 text-sm text-slate-700">۱۴۰۲/۰۶/۰۱</td>
-          <td class="p-4 text-sm text-rose-700 font-mono italic">۱۴۰۲/۰۶/۰۵</td>
-          <td class="p-4">
-            <span class="px-3 py-1 rounded-full bg-rose-50 text-rose-700 text-xs font-bold border border-rose-200">تاخیر
-              خورده</span>
-          </td>
-          <td class="p-4 text-slate-400 text-xs">---</td>
-          <td class="p-4">
-            <button class="text-slate-500 hover:text-slate-900 transition"><i class="fas fa-eye"></i></button>
-          </td>
-        </tr>
+        {% endfor %}
 
-        <tr class="hover:bg-slate-50 transition-colors">
-          <td class="p-4">
-            <div class="font-bold text-slate-900">جلسه هماهنگی با کلاینت</div>
-            <div class="text-xs text-slate-500">عمومی</div>
-          </td>
-          <td class="p-4 text-sm text-slate-700">۱۴۰۲/۰۶/۱۰</td>
-          <td class="p-4 text-sm text-slate-700 font-mono">۱۴۰۲/۰۶/۱۱</td>
-          <td class="p-4">
-            <span class="px-3 py-1 rounded-full bg-sky-50 text-sky-700 text-xs font-bold border border-sky-200">در حال
-              انجام</span>
-          </td>
-          <td class="p-4 text-slate-400 text-xs">---</td>
-          <td class="p-4">
-            <button class="text-slate-500 hover:text-slate-900 transition"><i class="fas fa-eye"></i></button>
-          </td>
-        </tr>
       </tbody>
+
     </table>
+
   </div>
 
-  <!-- Pagination -->
+
+  {% if page_obj.paginator.num_pages > 1 %}
+
   <div class="p-6 bg-white/60 flex justify-center border-t border-slate-200">
+
     <nav class="flex gap-2">
-      <button
-        class="w-10 h-10 rounded-lg bg-teal-600 text-white flex items-center justify-center hover:bg-teal-700 transition">۱</button>
-      <button
-        class="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center hover:bg-teal-600 hover:text-white transition text-slate-500">۲</button>
-      <button
-        class="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center hover:bg-teal-600 hover:text-white transition text-slate-500">۳</button>
+
+      {% for num in page_obj.paginator.page_range %}
+
+      <a href="?page={{ num }}{% if selected_status %}&status={{ selected_status }}{% endif %}{% if selected_role %}&role={{ selected_role }}{% endif %}#tasks-history"
+        class="w-10 h-10 rounded-lg flex items-center justify-center transition
+        {% if page_obj.number == num %}
+        bg-teal-600 text-white
+        {% else %}
+        bg-slate-100 text-slate-500 hover:bg-teal-600 hover:text-white
+        {% endif %}">
+
+        {{ num }}
+
+      </a>
+
+      {% endfor %}
+
     </nav>
+
   </div>
+
+  {% endif %}
+
+
 </div>
+
+
 
 <!-- </div> -->
 

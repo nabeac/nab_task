@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required
 from persiantools.jdatetime import JalaliDate
 from account.models import User
 from .models import Task, Activity, Report
+from django.core.paginator import Paginator
 from .forms import TaskForm ,ActivityForm, ReportForm
 from django.db.models import Q
 
@@ -46,8 +47,20 @@ def task_list(request):
             Q(main_responsible=request.user) |
             Q(review_by=request.user)
         ).distinct()
+    
+    paginator = Paginator(tasks, 5)  # هر صفحه 5 تسک
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
 
-    return render(request, 'task/task_list.html', {'task': tasks})
+    context = {
+        "task": page_obj,
+        "page_obj": page_obj,
+        "q": q,
+        "selected_status": status,
+        "filter_type": filter_type,
+    }
+
+    return render(request, 'task/task_list.html', context)
 
 
 class TaskView(LoginRequiredMixin, DetailView):
@@ -150,6 +163,50 @@ class ProfileView(LoginRequiredMixin, DetailView):
 
     def get_object(self, queryset=None):
         return self.request.user
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        status = self.request.GET.get("status")
+        role = self.request.GET.get("role")
+
+        # tasks = self.request.user.get_tasks()["my_tasks_all"]
+        
+
+        tasks = Task.objects.filter(
+            Q(main_responsible=self.request.user) |
+            Q(creator=self.request.user) |
+            Q(review_by=self.request.user)
+        ).distinct()
+
+        
+        review = self.request.user.get_tasks()["review_tasks_all"]
+
+        if role == "creator":
+            tasks = Task.objects.filter(creator=self.request.user)
+
+        elif role == "responsible":
+            tasks = Task.objects.filter(main_responsible=self.request.user)
+
+        elif role == "review":
+            tasks = Task.objects.filter(review_by=self.request.user)
+
+        if status:
+            tasks = tasks.filter(status=status)
+
+        paginator = Paginator(tasks, 5)  # هر صفحه 5 تسک
+        page_number = self.request.GET.get("page")
+        page_obj = paginator.get_page(page_number)
+
+        
+
+        context["tasks"] = tasks 
+        context["selected_status"] = status
+        context["selected_role"] = role
+        context["page_obj"] = page_obj
+
+        return context
+
 
         
 
