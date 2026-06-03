@@ -2,14 +2,16 @@ import jdatetime
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
-
+from django.db.models import Sum
+from datetime import timedelta
+from statistics import mean
 
 
 
 class User(AbstractUser):
     phone = models.CharField(max_length=100, null=True, blank=True)
     birth = models.DateField(null=True, blank=True)
-
+    body = models.CharField(max_length=50, default='n')
     # def get_task_summary(self):
     #     all_tasks = self.main_responsible_tasks.all()
     #     today_m = timezone.localdate()
@@ -135,4 +137,103 @@ class User(AbstractUser):
             ).order_by('-completed_at'),
         }
             
+
+
+
+
+
+    def get_course_stats(user, course):
+        reports = course.course_re.filter(student=user).order_by("day")
+
+        aggregates = reports.aggregate(
+            total_videos_watched=Sum("videos_number"),
+            total_hours_watched=Sum("hours_number"),
+        )
+
+        watched_videos = aggregates["total_videos_watched"] or 0
+        total_hours_watched = aggregates["total_hours_watched"] or 0
+
+        total_videos = course.videos or 0
+        total_course_hours = course.hours or 0
+
+        # جلوگیری از بیشتر شدن از سقف
+        if total_videos:
+            watched_videos = min(watched_videos, total_videos)
+
+        remaining_videos = total_videos - watched_videos
+
+        progress_percent = 0
+        if total_videos:
+            progress_percent = round((watched_videos / total_videos) * 100, 1)
+            circumference = 289
+            progress_offset = circumference * (1 - progress_percent / 100)
+
+            
+
+        # -----------------------------
+    
+        if reports.exists():
+            first_day = reports.first().day
+            today = timezone.now().date()
+            total_days = (today - first_day).days + 1
+            average_daily_hours = round(total_hours_watched / total_days, 2) if total_days > 0 else 0
+        else:
+            average_daily_hours = 0
+
+
+        gaps = []
+        report_days = list(reports.values_list("day", flat=True))
+
+        for i in range(1, len(report_days)):
+            gap = (report_days[i] - report_days[i - 1]).days
+            gaps.append(gap)
+
+        if gaps:
+            max_gap = max(gaps)
+            min_gap = min(gaps)
+            avg_gap = round(mean(gaps), 2)
+        else:
+            max_gap = min_gap = avg_gap = 0
+
+        # فاصله از آخرین مطالعه تا امروز
+        if report_days:
+            current_gap = (timezone.now().date() - report_days[-1]).days
+        else:
+            current_gap = 0
+
+        
+        today = jdatetime.date.today()
+        last_7_days_data = []
+
+        for i in range(6, -1, -1):
+            day = today - timedelta(days=i)
+            day_hours = reports.filter(day=day).aggregate(
+                total=Sum("hours_number")
+            )["total"] or 0
+
+            last_7_days_data.append({
+                "day": day,
+                "hours": float(day_hours),
+            })
+
+      
+        return {
+            "total_videos": total_videos,
+            "watched_videos": watched_videos,
+            "remaining_videos": remaining_videos,
+            "progress_percent": progress_percent,
+            "progress_offset": progress_offset,
+            
+            "total_hours_watched": total_hours_watched,
+            "average_daily_hours": average_daily_hours,
+
+            "max_gap": max_gap,
+            "min_gap": min_gap,
+            "avg_gap": avg_gap,
+            "current_gap": current_gap,
+
+            "gaps_list": gaps,
+            "last_7_days": last_7_days_data,
+        }
+
 

@@ -38,7 +38,7 @@
 
     <h2 class="text-2xl font-black mt-4 text-slate-900">{{ profile_view.get_full_name }}
     </h2>
-    <p class="text-teal-700 font-semibold">مدیر پروژه / برنامه نویس ارشد</p>
+    <p class="text-teal-700 font-semibold">{{ profile_view.body }}</p>
 
     <div class="flex gap-4 mt-6">
       <div class="text-center px-4">
@@ -159,17 +159,24 @@
         <span class="text-sm font-normal text-slate-500">تسک بسته شده</span>
       </div>
 
-      <p class="text-emerald-600 text-sm mt-1">
+      <p class="text-emerald-600 text-sm mt-1 shadow-xl">
         <i class="fas fa-arrow-up ml-1"></i>
         فعالیت این ماه
+
+
       </p>
 
-      <div class="mt-6 flex items-end gap-2 h-20">
+      <div class="mt-6 flex items-end gap-2 h-20 shadow-lg">
         <div class="bg-teal-600/20 hover:bg-teal-600 w-full h-12 rounded-t-md transition-all"></div>
         <div class="bg-teal-600/20 hover:bg-teal-600 w-full h-16 rounded-t-md transition-all"></div>
         <div class="bg-teal-600/20 hover:bg-teal-600 w-full h-8 rounded-t-md transition-all"></div>
         <div class="bg-teal-600/20 hover:bg-teal-600 w-full h-20 rounded-t-md transition-all"></div>
         <div class="bg-teal-600 w-full h-14 rounded-t-md"></div>
+      </div>
+      <div class="absolute inset-0 flex items-center justify-center">
+        <span class="bg-black/70 text-white px-6 py-2 rounded-full text-sm font-bold shadow-lg">
+          بزودی
+        </span>
       </div>
     </div>
     {% endwith %}
@@ -238,26 +245,40 @@
     </div>
 
     <div class="flex gap-2 items-center">
-      <label class="text-sm text-slate-600 font-bold">انتخاب دوره:</label>
-      <select
-        class="bg-white border border-slate-200 rounded-xl text-sm px-4 py-2 focus:ring-2 ring-teal-500 outline-none">
-        <option>دوره جنگو (مقدماتی)</option>
-        <option>دوره ری‌اکت</option>
-        <option>دوره الگوریتم</option>
-      </select>
-    </div>
+  <label class="text-sm text-slate-600 font-bold">انتخاب دوره:</label>
+
+  <select id="filter-course"
+    onchange="updateFilters()"
+    class="bg-white border border-slate-200 rounded-xl text-sm px-4 py-2 focus:ring-2 ring-teal-500 outline-none">
+
+    {% for c in courses %}
+    <option value="{{ c.id }}" {% if selected_course.id == c.id %}selected{% endif %}>
+      {{ c.name }}
+    </option>
+    {% endfor %}
+
+  </select>
+</div>
+
+
   </div>
 
   <!-- Top KPIs -->
   <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+
     <!-- Videos Watched -->
     <div class="bg-white rounded-2xl border border-slate-200 p-5">
       <div class="flex items-center justify-between">
         <div>
           <div class="text-xs text-slate-500 font-bold">ویدیوهای دیده‌شده</div>
-          <div class="text-3xl font-black text-slate-900 mt-1">۳۲ <span class="text-sm font-normal text-slate-500">از
-              ۵۰</span></div>
+          <div class="text-3xl font-black text-slate-900 mt-1">
+            {{ watched_videos }}
+            <span class="text-sm font-normal text-slate-500">
+              از {{ total_videos }}
+            </span>
+          </div>
         </div>
+
         <div class="w-12 h-12 rounded-2xl bg-teal-50 text-teal-700 flex items-center justify-center">
           <i class="fas fa-play"></i>
         </div>
@@ -266,10 +287,12 @@
       <div class="mt-4">
         <div class="flex justify-between text-xs text-slate-600 mb-1">
           <span>پیشرفت</span>
-          <span class="font-bold text-teal-700">۶۴٪</span>
+          <span class="font-bold text-teal-700">{{ progress_percent }}٪</span>
         </div>
+
         <div class="w-full bg-slate-200 rounded-full h-2">
-          <div class="bg-teal-600 h-2 rounded-full" style="width: 64%"></div>
+          <div class="bg-teal-600 h-2 rounded-full" style="width: {{ progress_percent }}%">
+          </div>
         </div>
       </div>
     </div>
@@ -279,16 +302,23 @@
       <div class="flex items-center justify-between">
         <div>
           <div class="text-xs text-slate-500 font-bold">ساعات مشاهده‌شده</div>
-          <div class="text-3xl font-black text-slate-900 mt-1">۱۸٫۵ <span
-              class="text-sm font-normal text-slate-500">ساعت</span></div>
+
+          <div class="text-3xl font-black text-slate-900 mt-1">
+            {{ total_hours_watched }}
+            <span class="text-sm font-normal text-slate-500">ساعت</span>
+          </div>
         </div>
+
         <div class="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-700 flex items-center justify-center">
           <i class="fas fa-clock"></i>
         </div>
       </div>
 
       <p class="text-xs text-slate-500 mt-4">
-        میانگین روزانه: <span class="font-bold text-slate-700">۴۵ دقیقه</span>
+        میانگین روزانه:
+        <span class="font-bold text-slate-700">
+          {{ average_daily_hours }} ساعت
+        </span>
       </p>
     </div>
 
@@ -297,45 +327,56 @@
       <div class="flex items-center justify-between">
         <div>
           <div class="text-xs text-slate-500 font-bold">اختلاف روزها (Consistency)</div>
-          <div class="text-3xl font-black text-slate-900 mt-1">۳ <span
-              class="text-sm font-normal text-slate-500">روز</span></div>
+
+          <div class="text-3xl font-black text-slate-900 mt-1">
+            {{ avg_gap }}
+            <span class="text-sm font-normal text-slate-500">روز</span>
+          </div>
         </div>
+
         <div class="w-12 h-12 rounded-2xl bg-rose-50 text-rose-700 flex items-center justify-center">
           <i class="fas fa-calendar-day"></i>
         </div>
       </div>
 
       <p class="text-xs text-slate-500 mt-4">
-        بیشترین فاصله در این ماه: <span class="font-bold text-rose-700">۷ روز</span>
+        بیشترین فاصله:
+        <span class="font-bold text-rose-700">{{ max_gap }} روز</span>
       </p>
     </div>
   </div>
 
   <!-- Charts -->
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-    <!-- Progress donut (static placeholder) -->
+
+    <!-- Progress donut -->
     <div class="bg-white rounded-2xl border border-slate-200 p-5 lg:col-span-1">
       <div class="flex items-center justify-between mb-3">
         <h4 class="font-extrabold text-slate-900">پیشرفت کلی دوره</h4>
-        <span class="text-xs font-bold text-teal-700 bg-teal-50 px-3 py-1 rounded-full">۶۴٪</span>
+        <span class="text-xs font-bold text-teal-700 bg-teal-50 px-3 py-1 rounded-full">
+          {{ progress_percent }}٪
+        </span>
       </div>
 
       <div class="flex items-center justify-center py-6">
-        <!-- SVG donut chart (static) -->
-        <svg width="140" height="140" viewBox="0 0 120 120" class="progress-ring">
+        <svg width="140" height="140" viewBox="0 0 120 120">
+
           <circle cx="60" cy="60" r="46" fill="none" stroke="#e2e8f0" stroke-width="12"></circle>
-          <!-- 64% -->
+
           <circle cx="60" cy="60" r="46" fill="none" stroke="#0d9488" stroke-width="12" stroke-linecap="round"
-            stroke-dasharray="289" stroke-dashoffset="104"></circle>
+            stroke-dasharray="289" stroke-dashoffset="{{ progress_offset }}">
+          </circle>
+
         </svg>
       </div>
 
       <div class="text-center text-sm text-slate-600">
-        <div>باقی‌مانده: <span class="font-bold">۱۸ ویدیو</span></div>
+        باقی‌مانده:
+        <span class="font-bold">{{ remaining_videos }} ویدیو</span>
       </div>
     </div>
 
-    <!-- Daily watched hours (bar chart placeholder) -->
+    <!-- 7 day chart -->
     <div class="bg-white rounded-2xl border border-slate-200 p-5 lg:col-span-2">
       <div class="flex items-center justify-between mb-3">
         <h4 class="font-extrabold text-slate-900">ساعات مشاهده (۷ روز اخیر)</h4>
@@ -343,14 +384,11 @@
       </div>
 
       <div class="mt-6 flex items-end gap-2 h-28">
-        <!-- bars (static demo) -->
-        <div class="w-full rounded-t-md bg-teal-600/20 hover:bg-teal-600 transition-all h-10"></div>
-        <div class="w-full rounded-t-md bg-teal-600/20 hover:bg-teal-600 transition-all h-20"></div>
-        <div class="w-full rounded-t-md bg-teal-600/20 hover:bg-teal-600 transition-all h-14"></div>
-        <div class="w-full rounded-t-md bg-teal-600/20 hover:bg-teal-600 transition-all h-24"></div>
-        <div class="w-full rounded-t-md bg-teal-600/20 hover:bg-teal-600 transition-all h-8"></div>
-        <div class="w-full rounded-t-md bg-teal-600/20 hover:bg-teal-600 transition-all h-16"></div>
-        <div class="w-full rounded-t-md bg-teal-600 h-22"></div>
+        {% for d in last_7_days %}
+        <div class="w-full rounded-t-md bg-teal-600/20 hover:bg-teal-600 transition-all"
+          style="height: {{ d.hours|floatformat:0 }}0px">
+        </div>
+        {% endfor %}
       </div>
 
       <div class="mt-4 grid grid-cols-7 text-[10px] text-slate-500">
@@ -364,54 +402,24 @@
       </div>
     </div>
 
-    <!-- "نمودار میلی اختلاف روز ها" (sparkline placeholder) -->
+    <!-- gap stats -->
     <div class="bg-white rounded-2xl border border-slate-200 p-5 lg:col-span-3">
       <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 mb-3">
-        <h4 class="font-extrabold text-slate-900">نمودار اختلاف روزها (میلی/ریز)</h4>
-        <p class="text-xs text-slate-500">نمایش فاصله روزهای مطالعه (هرچه پایین‌تر بهتر)</p>
-      </div>
-
-      <!-- simple sparkline (static SVG) -->
-      <div class="w-full overflow-x-auto">
-        <svg viewBox="0 0 600 120" class="w-full h-28">
-          <!-- grid -->
-          <path d="M0 100 H600" stroke="#e2e8f0" />
-          <path d="M0 70 H600" stroke="#f1f5f9" />
-          <path d="M0 40 H600" stroke="#f1f5f9" />
-          <path d="M0 10 H600" stroke="#f1f5f9" />
-
-          <!-- area -->
-          <path d="M10 90
-                       C 70 60, 110 95, 170 70
-                       S 270 80, 330 50
-                       S 430 85, 490 65
-                       S 560 75, 590 40
-                       L 590 110 L10 110 Z" fill="rgba(13, 148, 136, 0.12)" />
-
-          <!-- line -->
-          <path d="M10 90
-                       C 70 60, 110 95, 170 70
-                       S 270 80, 330 50
-                       S 430 85, 490 65
-                       S 560 75, 590 40" fill="none" stroke="#0d9488" stroke-width="3" stroke-linecap="round" />
-
-          <!-- points -->
-          <circle cx="10" cy="90" r="4" fill="#0d9488" />
-          <circle cx="170" cy="70" r="4" fill="#0d9488" />
-          <circle cx="330" cy="50" r="4" fill="#0d9488" />
-          <circle cx="490" cy="65" r="4" fill="#0d9488" />
-          <circle cx="590" cy="40" r="4" fill="#0d9488" />
-        </svg>
+        <h4 class="font-extrabold text-slate-900">نمودار اختلاف روزها</h4>
+        <p class="text-xs text-slate-500">نمایش فاصله روزهای مطالعه</p>
       </div>
 
       <div class="mt-2 text-xs text-slate-600 flex flex-wrap gap-4">
-        <span>کمترین فاصله: <b class="text-emerald-700">۰ روز</b></span>
-        <span>میانگین فاصله: <b class="text-slate-800">۲.۱ روز</b></span>
-        <span>بیشترین فاصله: <b class="text-rose-700">۷ روز</b></span>
+        <span>کمترین فاصله: <b class="text-emerald-700">{{ min_gap }} روز</b></span>
+        <span>میانگین فاصله: <b class="text-slate-800">{{ avg_gap }} روز</b></span>
+        <span>بیشترین فاصله: <b class="text-rose-700">{{ max_gap }} روز</b></span>
       </div>
     </div>
+
   </div>
 </div>
+
+
 
 
 <!-- History of All Tasks Table -->
@@ -423,58 +431,54 @@
       تاریخچه کامل تسک‌های من
     </h3>
 
-    <form method="get" class="flex gap-2" onsubmit="this.action = window.location.pathname + '#tasks-history';">
+    <select id="filter-status"
+  onchange="updateFilters()"
+  class="bg-white border border-slate-200 rounded-xl text-sm px-4 py-2">
 
-      <select name="status" class="bg-white border border-slate-200 rounded-xl text-sm px-4 py-2">
-        <option value="">همه وضعیت‌ها</option>
+  <option value="">همه وضعیت‌ها</option>
 
-        <option value="done" {% if selected_status == "done" %}selected{% endif %}>
-          تکمیل شده
-        </option>
+  <option value="done" {% if selected_status == "done" %}selected{% endif %}>
+    تکمیل شده
+  </option>
 
-        <option value="working" {% if selected_status == "working" %}selected{% endif %}>
-          در حال انجام
-        </option>
+  <option value="working" {% if selected_status == "working" %}selected{% endif %}>
+    در حال انجام
+  </option>
 
-        <option value="in_progress" {% if selected_status == "in_progress" %}selected{% endif %}>
-          درحال بررسی
-        </option>
+  <option value="in_progress" {% if selected_status == "in_progress" %}selected{% endif %}>
+    درحال بررسی
+  </option>
 
-        <option value="error" {% if selected_status == "error" %}selected{% endif %}>
-          به مشکل خورده
-        </option>
+  <option value="error" {% if selected_status == "error" %}selected{% endif %}>
+    به مشکل خورده
+  </option>
 
-        <option value="rejected" {% if selected_status == "rejected" %}selected{% endif %}>
-          رد شده
-        </option>
+  <option value="rejected" {% if selected_status == "rejected" %}selected{% endif %}>
+    رد شده
+  </option>
 
-      </select>
+</select>
 
+<select id="filter-role"
+  onchange="updateFilters()"
+  class="bg-white border border-slate-200 rounded-xl text-sm px-4 py-2">
 
-      <select name="role" class="bg-white border border-slate-200 rounded-xl text-sm px-4 py-2">
+  <option value="">همه نقش‌ها</option>
 
-        <option value="">همه نقش‌ها</option>
+  <option value="responsible" {% if selected_role == "responsible" %}selected{% endif %}>
+    مسئول اصلی
+  </option>
 
-        <option value="responsible" {% if selected_role == "responsible" %}selected{% endif %}>
-          مسئول اصلی
-        </option>
+  <option value="creator" {% if selected_role == "creator" %}selected{% endif %}>
+    ایجاد کننده
+  </option>
 
-        <option value="creator" {% if selected_role == "creator" %}selected{% endif %}>
-          ایجاد کننده
-        </option>
+  <option value="review" {% if selected_role == "review" %}selected{% endif %}>
+    نیازمند بررسی من
+  </option>
 
-        <option value="review" {% if selected_role == "review" %}selected{% endif %}>
-          نیازمند بررسی من
-        </option>
+</select>
 
-      </select>
-
-
-      <button type="submit" class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-xl text-sm font-bold">
-        فیلتر
-      </button>
-
-    </form>
   </div>
 
 
@@ -562,33 +566,33 @@
   </div>
 
 
-  {% if page_obj.paginator.num_pages > 1 %}
+{% if page_obj.paginator.num_pages > 1 %}
 
-  <div class="p-6 bg-white/60 flex justify-center border-t border-slate-200">
+<div class="p-6 bg-white/60 flex justify-center border-t border-slate-200">
 
-    <nav class="flex gap-2">
+<nav class="flex gap-2">
 
-      {% for num in page_obj.paginator.page_range %}
+{% for num in page_obj.paginator.page_range %}
 
-      <a href="?page={{ num }}{% if selected_status %}&status={{ selected_status }}{% endif %}{% if selected_role %}&role={{ selected_role }}{% endif %}#tasks-history"
-        class="w-10 h-10 rounded-lg flex items-center justify-center transition
-        {% if page_obj.number == num %}
-        bg-teal-600 text-white
-        {% else %}
-        bg-slate-100 text-slate-500 hover:bg-teal-600 hover:text-white
-        {% endif %}">
+<a href="?page={{ num }}{% if selected_status %}&status={{ selected_status }}{% endif %}{% if selected_role %}&role={{ selected_role }}{% endif %}{% if selected_course %}&course={{ selected_course.id }}{% endif %}#tasks-history"
+class="w-10 h-10 rounded-lg flex items-center justify-center transition
+{% if page_obj.number == num %}
+bg-teal-600 text-white
+{% else %}
+bg-slate-100 text-slate-500 hover:bg-teal-600 hover:text-white
+{% endif %}">
 
-        {{ num }}
+{{ num }}
 
-      </a>
+</a>
 
-      {% endfor %}
+{% endfor %}
 
-    </nav>
+</nav>
 
-  </div>
+</div>
 
-  {% endif %}
+{% endif %}
 
 
 </div>
@@ -596,6 +600,46 @@
 
 
 <!-- </div> -->
+
+<script>
+
+
+
+function updateFilters() {
+
+  const url = new URL(window.location.href)
+
+  const course = document.getElementById("filter-course")
+  const status = document.getElementById("filter-status")
+  const role = document.getElementById("filter-role")
+
+  if(course && course.value){
+    url.searchParams.set("course", course.value)
+  }
+
+  if(status){
+    if(status.value){
+      url.searchParams.set("status", status.value)
+    }else{
+      url.searchParams.delete("status")
+    }
+  }
+
+  if(role){
+    if(role.value){
+      url.searchParams.set("role", role.value)
+    }else{
+      url.searchParams.delete("role")
+    }
+  }
+
+  window.location.href = url.pathname + url.search + "#tasks-history"
+
+}
+
+</script>
+
+
 
 
 

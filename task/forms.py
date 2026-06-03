@@ -6,7 +6,7 @@ class TaskForm(forms.ModelForm):
 
     class Meta:
         model = Task
-        exclude  = ['creator', 'start_date', 'end_date']
+        exclude  = ['creator', 'start_date', 'end_date','completed_at']
 
 
 

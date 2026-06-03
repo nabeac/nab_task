@@ -6,7 +6,7 @@ from django.urls import reverse_lazy
 from django.contrib.auth.decorators import login_required
 from persiantools.jdatetime import JalaliDate
 from account.models import User
-from .models import Task, Activity, Report
+from .models import Task, Activity, Report, Course
 from django.core.paginator import Paginator
 from .forms import TaskForm ,ActivityForm, ReportForm
 from django.db.models import Q
@@ -158,8 +158,8 @@ class ReportCreateView(LoginRequiredMixin, CreateView):
 
 class ProfileView(LoginRequiredMixin, DetailView):
     model = User
-    context_object_name = 'profile_view'
-    template_name = 'task/profile.html'
+    context_object_name = "profile_view"
+    template_name = "task/profile.html"
 
     def get_object(self, queryset=None):
         return self.request.user
@@ -167,49 +167,78 @@ class ProfileView(LoginRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
+        user = self.request.user
+
+        # ---------------------------------
+        # GET Parameters
+        # ---------------------------------
         status = self.request.GET.get("status")
         role = self.request.GET.get("role")
+        course_id = self.request.GET.get("course")
+        page_number = self.request.GET.get("page")
 
-        # tasks = self.request.user.get_tasks()["my_tasks_all"]
-        
+       
 
+        # Base queryset (همیشه از این شروع می‌کنیم)
         tasks = Task.objects.filter(
-            Q(main_responsible=self.request.user) |
-            Q(creator=self.request.user) |
-            Q(review_by=self.request.user)
+            Q(main_responsible=user) |
+            Q(creator=user) |
+            Q(review_by=user)
         ).distinct()
 
-        
-        review = self.request.user.get_tasks()["review_tasks_all"]
+        # ---- Role Filter (بدون overwrite)
+        if role in ["creator", "responsible", "review"]:
+            if role == "creator":
+                tasks = tasks.filter(creator=user)
 
-        if role == "creator":
-            tasks = Task.objects.filter(creator=self.request.user)
+            elif role == "responsible":
+                tasks = tasks.filter(main_responsible=user)
 
-        elif role == "responsible":
-            tasks = Task.objects.filter(main_responsible=self.request.user)
+            elif role == "review":
+                tasks = tasks.filter(review_by=user)
 
-        elif role == "review":
-            tasks = Task.objects.filter(review_by=self.request.user)
-
+        # ---- Status Filter
         if status:
             tasks = tasks.filter(status=status)
 
-        paginator = Paginator(tasks, 5)  # هر صفحه 5 تسک
-        page_number = self.request.GET.get("page")
+        # ---- Order (خیلی مهم برای pagination پایدار)
+        tasks = tasks.order_by("-id")
+
+        # ---- Pagination
+        paginator = Paginator(tasks, 5)
         page_obj = paginator.get_page(page_number)
 
-        
+    
 
-        context["tasks"] = tasks 
-        context["selected_status"] = status
-        context["selected_role"] = role
-        context["page_obj"] = page_obj
+        courses = Course.objects.filter(student=user)
+
+        selected_course = None
+        stats = {}
+
+        if courses.exists():
+            if course_id:
+                selected_course = courses.filter(id=course_id).first()
+            else:
+                selected_course = courses.first()
+
+            if selected_course:
+                stats = user.get_course_stats(selected_course)
+
+      
+        context.update({
+            "page_obj": page_obj,
+            "tasks": page_obj.object_list,  # مهم 
+            "selected_status": status,
+            "selected_role": role,
+            "courses": courses,
+            "selected_course": selected_course,
+        })
+
+        context.update(stats)
 
         return context
 
 
-        
 
-
-
-
+def todolist(request):
+    return render(request, 'task/todo_list.html')
