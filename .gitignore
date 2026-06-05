@@ -24,6 +24,8 @@ settings_local.py
 *.sqlite3
 db.sqlite3
 nabeaccount.zip
+nabeaccount_v_1_2_1.zip
+nabeaccount_v_1_2_2.zip
 # ---- Media uploads ---- #djh305
 media/
 database/

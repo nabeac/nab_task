@@ -48,54 +48,92 @@
 <body class="bg-slate-50 min-h-screen flex flex-col">
 
     <!-- Navigation -->
-    <nav class="glass-nav sticky top-0 z-50 text-white shadow-lg">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
-                <!-- Logo Section -->
-                <div class="flex items-center gap-4">
-                    <a href="{% url 'home:list_task' %}" class="flex items-center group">
-                        <div class="bg-white  rounded-lg group-hover:rotate-12 transition-transform duration-300">
-                            <img class="h-12 w-12" src="https://abrehamrahi.ir/o/public/cfYIThZE/" alt="">
-                            <!-- <svg class="text-teal-600 h-6 w-6" fill="currentColor" viewBox="0 0 54 54">
-                                <path d="M13.5 22.1c1.8-7.2 6.3-10.8 13.5-10.8 10.8 0 12.15 8.1 17.55 9.45 3.6.9 6.75-.45 9.45-4.05-1.8 7.2-6.3 10.8-13.5 10.8-10.8 0-12.15-8.1-17.55-9.45-3.6-.9-6.75.45-9.45 4.05zM0 38.3c1.8-7.2 6.3-10.8 13.5-10.8 10.8 0 12.15 8.1 17.55 9.45 3.6.9 6.75-.45 9.45-4.05-1.8 7.2-6.3 10.8-13.5 10.8-10.8 0-12.15-8.1-17.55-9.45-3.6-.9-6.75.45-9.45 4.05z"/>
-                            </svg> -->
-                        </div>
-                        <span class="mr-3 font-bold text-xl tracking-tight">ناب تسک</span>
-                    </a>
+<nav class="glass-nav sticky top-0 z-50 text-white shadow-lg">
+    <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
+        <div class="flex items-center justify-between h-14 sm:h-16">
+            <!-- Logo Section -->
+            <div class="flex items-center gap-2 sm:gap-4">
+                <a href="{% url 'home:list_task' %}" class="flex items-center group">
+                    <div class="bg-white rounded-lg group-hover:rotate-12 transition-transform duration-300">
+                        <img class="h-8 w-8 sm:h-10 sm:w-10 lg:h-12 lg:w-12" src="https://abrehamrahi.ir/o/public/cfYIThZE/" alt="">
+                    </div>
+                    <span class="mr-2 sm:mr-3 font-bold text-base sm:text-lg lg:text-xl tracking-tight">ناب تسک</span>
+                </a>
 
-                    <!-- Desktop Links -->
-                    <div class="hidden md:flex items-center gap-6 mr-8">
-                        <a href="{% url 'home:task_create' %}" class="hover:text-teal-100 transition-colors">تسک جدید</a>
-                        <a href="{% url 'home:todo' %}" class="hover:text-teal-100 transition-colors">لیست انجام</a>
-                        <a href="{% url 'home:report_create' %}" class="hover:text-teal-100 transition-colors">ثبت گزارش</a>
-                    </div>
-                </div>
-
-                <!-- User Profile Dropdown -->
-                <div class="flex items-center gap-4">
-                    <div id="today-badge" class="hidden lg:block bg-teal-600/50 px-3 py-1 rounded-full text-xs">
-                        <!-- Date via JS -->
-                    </div>
-                    
-                    <div class="relative group">
-                        <button class="flex items-center gap-2 bg-teal-600 hover:bg-teal-700 px-4 py-2 rounded-xl transition-all border border-teal-400/30 shadow-sm">
-                            <span class="text-sm font-medium">{{ request.user.get_full_name|default:"کاربر مهمان" }}</span>
-                            <svg class="w-4 h-4 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                        </button>
-                        
-                        <!-- Dropdown Menu -->
-                        <div class="absolute left-0 mt-2 w-48 bg-white rounded-2xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform origin-top-right border border-gray-100 overflow-hidden">
-                            <a href="{% url 'home:profile' %}" class="block px-4 py-3 text-sm text-gray-700 hover:bg-teal-50 transition-colors border-b border-gray-50">پروفایل کاربری</a>
-                            <form action="{% url 'accounts:logout' %}" method="post">
-                                {% csrf_token %}
-                                <button class="w-full text-right block px-4 py-3 text-sm text-red-500 hover:bg-red-50 transition-colors">خروج از حساب</button>
-                            </form>
-                        </div>
-                    </div>
+                <!-- Desktop Links -->
+                <div class="hidden md:flex items-center gap-4 lg:gap-6 mr-4 lg:mr-8">
+                    <a href="{% url 'home:task_create' %}" class="hover:text-teal-100 transition-colors text-sm lg:text-base">تسک جدید</a>
+                    <a href="{% url 'home:todo' %}" class="hover:text-teal-100 transition-colors text-sm lg:text-base">لیست انجام</a>
+                    <a href="{% url 'home:report_create' %}" class="hover:text-teal-100 transition-colors text-sm lg:text-base">ثبت گزارش</a>
                 </div>
             </div>
+
+            <!-- User Profile & Mobile Menu -->
+            <div class="flex items-center gap-2 sm:gap-4">
+                <div id="today-badge" class="hidden lg:block bg-teal-600/50 px-3 py-1 rounded-full text-xs">
+                    <!-- Date via JS -->
+                </div>
+                
+                <div class="hidden sm:block relative group">
+                    <button class="flex items-center gap-2 bg-teal-600 hover:bg-teal-700 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl transition-all border border-teal-400/30 shadow-sm">
+                        <span class="text-xs sm:text-sm font-medium">{{ request.user.get_full_name|default:"کاربر مهمان" }}</span>
+                        <svg class="w-4 h-4 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    
+                    <!-- Dropdown Menu -->
+                    <div class="absolute left-0 mt-2 w-48 bg-white rounded-2xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform origin-top-right border border-gray-100 overflow-hidden">
+                        <a href="{% url 'home:profile' %}" class="block px-4 py-3 text-sm text-gray-700 hover:bg-teal-50 transition-colors border-b border-gray-50">پروفایل کاربری</a>
+                        <form action="{% url 'accounts:logout' %}" method="post">
+                            {% csrf_token %}
+                            <button class="w-full text-right block px-4 py-3 text-sm text-red-500 hover:bg-red-50 transition-colors">خروج از حساب</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <button id="menuBtn" class="md:hidden p-2 hover:bg-white/10 rounded-lg transition-colors" aria-label="منو">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
+                </button>
+            </div>
         </div>
-    </nav>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div id="mobileMenu" class="hidden md:hidden border-t border-white/20">
+        <div class="px-4 py-2 space-y-1">
+            <a href="{% url 'home:task_create' %}" class="block py-2.5 px-3 rounded-lg hover:bg-white/10 transition-colors">تسک جدید</a>
+            <a href="{% url 'home:todo' %}" class="block py-2.5 px-3 rounded-lg hover:bg-white/10 transition-colors">لیست انجام</a>
+            <a href="{% url 'home:report_create' %}" class="block py-2.5 px-3 rounded-lg hover:bg-white/10 transition-colors">ثبت گزارش</a>
+            
+            <!-- Mobile Profile Section -->
+            <div class="sm:hidden border-t border-white/20 mt-2 pt-2">
+                <a href="{% url 'home:profile' %}" class="block py-2.5 px-3 rounded-lg hover:bg-white/10 transition-colors">پروفایل کاربری</a>
+                <form action="{% url 'accounts:logout' %}" method="post">
+                    {% csrf_token %}
+                    <button class="w-full text-right py-2.5 px-3 rounded-lg hover:bg-red-500/20 transition-colors text-red-200">خروج از حساب</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<script>
+const btn = document.getElementById("menuBtn");
+const menu = document.getElementById("mobileMenu");
+
+btn.addEventListener("click", () => {
+    menu.classList.toggle("hidden");
+});
+
+document.addEventListener("click", (e) => {
+    if (!btn.contains(e.target) && !menu.contains(e.target)) {
+        menu.classList.add("hidden");
+    }
+});
+</script>
+
 
     <!-- Main Content Wrapper -->
     <main class="flex-grow container mx-auto px-4 py-8">
